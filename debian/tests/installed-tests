@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -eu
+
+namespace=SDL3_image/
+
+if [ -z "${HOME-}" ] || ! [ -w "${HOME}" ]; then
+    export HOME="${AUTOPKGTEST_TMP}"
+fi
+
+export SDL_AUDIO_DRIVER=dummy
+export SDL_VIDEO_DRIVER=dummy
+cd "$AUTOPKGTEST_TMP"
+
+# Assert that we support all the formats that we think we should support
+export SDL_IMAGE_TEST_REQUIRE_LOAD_AVIF=0
+export SDL_IMAGE_TEST_REQUIRE_LOAD_BMP=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_CUR=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_GIF=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_ICO=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_JPG=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_JXL=0
+export SDL_IMAGE_TEST_REQUIRE_LOAD_LBM=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_PCX=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_PNG=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_PNM=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_QOI=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_SVG=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_TGA=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_TIF=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_WEBP=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_XPM=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_XV=1
+
+export SDL_IMAGE_TEST_REQUIRE_SAVE_JPG=1
+export SDL_IMAGE_TEST_REQUIRE_SAVE_PNG=1
+
+if [ -z "$(ginsttest-runner -l "$namespace")" ]; then
+    echo "Error: no installed-tests found matching $namespace" >&2
+    exit 1
+fi
+
+exec ginsttest-runner --tap "$namespace"
