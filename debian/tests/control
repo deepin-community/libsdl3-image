@@ -1,0 +1,18 @@
+Tests: libsdl3-image-dev
+Restrictions: allow-stderr, superficial
+Depends:
+ build-essential,
+ cmake,
+ debconf,
+ file,
+ libsdl3-image-dev,
+ ninja-build,
+ pkgconf,
+ xauth,
+ xvfb,
+
+Tests: installed-tests
+Restrictions: allow-stderr, superficial
+Depends:
+ gnome-desktop-testing,
+ libsdl3-image-tests,

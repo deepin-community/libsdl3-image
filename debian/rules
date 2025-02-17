@@ -1,4 +1,112 @@
 #!/usr/bin/make -f
 
+export DEB_BUILD_MAINT_OPTIONS := hardening=+all
+
+include /usr/share/dpkg/default.mk
+
+built_binaries := $(shell dh_listpackages)
+
+confflags = -DSDLIMAGE_REVISION=$(DEB_VERSION_UPSTREAM_REVISION)
+confflags += -DSDLIMAGE_STRICT=ON
+confflags += -DSDLIMAGE_VENDORED=OFF
+
+ifneq ($(filter nocheck,$(DEB_BUILD_OPTIONS))$(filter %-tests,$(built_binaries)),nocheck)
+confflags += -DSDLIMAGE_TESTS=ON
+endif
+
+ifneq ($(filter %-doc,$(built_binaries)),)
+confflags += -DSDLIMAGE_INSTALL_MAN=ON
+endif
+
+ifneq ($(filter %-tests,$(built_binaries)),)
+confflags += -DSDLIMAGE_SAMPLES=ON
+confflags += -DSDLIMAGE_SAMPLES_INSTALL=ON
+confflags += -DSDLIMAGE_TESTS_INSTALL=ON
+endif
+
+# using libjpeg and libpng is straightforward in Debian
+confflags += -DSDLIMAGE_BACKEND_STB=OFF
+
+# doesn't seem to be in demand yet
+confflags += -DSDLIMAGE_AVIF=OFF
+confflags += -DSDLIMAGE_AVIF_SAVE=OFF
+
+confflags += -DSDLIMAGE_BMP=ON
+
+confflags += -DSDLIMAGE_GIF=ON
+
+confflags += -DSDLIMAGE_JPG=ON
+confflags += -DSDLIMAGE_JPG_SAVE=ON
+
+# doesn't seem to be stable yet
+confflags += -DSDLIMAGE_JXL=OFF
+
+confflags += -DSDLIMAGE_LBM=ON
+
+confflags += -DSDLIMAGE_PCX=ON
+
+confflags += -DSDLIMAGE_PNG=ON
+confflags += -DSDLIMAGE_PNG_SAVE=ON
+
+confflags += -DSDLIMAGE_PNM=ON
+
+confflags += -DSDLIMAGE_QOI=ON
+
+confflags += -DSDLIMAGE_SVG=ON
+
+confflags += -DSDLIMAGE_TGA=ON
+
+confflags += -DSDLIMAGE_TIF=ON
+
+confflags += -DSDLIMAGE_WEBP=ON
+
+confflags += -DSDLIMAGE_XCF=ON
+
+confflags += -DSDLIMAGE_XPM=ON
+
+confflags += -DSDLIMAGE_XV=ON
+
+# features -- disable building as plugins, otherwise dh_shlibs
+# cannot keep track of what we depend on
+confflags += -DSDLIMAGE_DEPS_SHARED=OFF
+
+# Assert that we support all the formats that we think we should support
+export SDL_IMAGE_TEST_REQUIRE_LOAD_AVIF=0
+export SDL_IMAGE_TEST_REQUIRE_LOAD_BMP=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_CUR=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_GIF=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_ICO=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_JPG=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_JXL=0
+export SDL_IMAGE_TEST_REQUIRE_LOAD_LBM=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_PCX=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_PNG=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_PNM=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_QOI=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_SVG=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_TGA=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_TIF=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_WEBP=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_XCF=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_XPM=1
+export SDL_IMAGE_TEST_REQUIRE_LOAD_XV=1
+
+export SDL_IMAGE_TEST_REQUIRE_SAVE_JPG=1
+export SDL_IMAGE_TEST_REQUIRE_SAVE_PNG=1
+
 %:
-	dh $@
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(confflags)
+
+override_dh_installchangelogs:
+	dh_installchangelogs -- CHANGES.txt
+
+# debhelper >= 13.4 makes all of /usr/libexec executable, which is not
+# quite right for installed-tests
+override_dh_fixperms:
+	dh_fixperms -Xusr/libexec/installed-tests
+ifneq ($(filter %-tests,$(built_binaries)),)
+	chmod --recursive --changes a+rX,u+w,og-w debian/*-tests/usr/libexec/installed-tests
+endif
