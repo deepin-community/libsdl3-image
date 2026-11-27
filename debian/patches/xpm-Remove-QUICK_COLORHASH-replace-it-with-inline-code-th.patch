@@ -1,0 +1,44 @@
+From: "Ryan C. Gordon" <icculus@icculus.org>
+Date: Mon, 6 Apr 2026 14:24:56 -0400
+Subject: xpm: Remove QUICK_COLORHASH,
+ replace it with inline code that checks for NULL.
+
+Closes #721.
+
+(cherry picked from commit bc17bc7c6a2767e342ebb6d3fd37c8e323c8dd70)
+
+Origin: upstream, 3.4.4, commit:8ffec045db5cd309f89b07edb7196815b3ba4a08
+Bug: https://github.com/libsdl-org/SDL_image/pull/721
+---
+ src/IMG_xpm.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/src/IMG_xpm.c b/src/IMG_xpm.c
+index 8b67f59..47a56f1 100644
+--- a/src/IMG_xpm.c
++++ b/src/IMG_xpm.c
+@@ -159,9 +159,6 @@ static int add_colorhash(struct color_hash *hash,
+     return 1;
+ }
+ 
+-/* fast lookup that works if cpp == 1 */
+-#define QUICK_COLORHASH(hash, key) ((hash)->table[*(Uint8 *)(key)]->color)
+-
+ static Uint32 get_colorhash(struct color_hash *hash, const char *key, int cpp)
+ {
+     struct hash_entry *entry = hash->table[hash_key(key, cpp, hash->size)];
+@@ -1144,9 +1141,11 @@ static SDL_Surface *load_xpm(char **xpm, SDL_IOStream *src, bool force_32bit)
+         if (indexed) {
+             /* optimization for some common cases */
+             if (cpp == 1)
+-                for (x = 0; x < w; x++)
+-                    dst[x] = (Uint8)QUICK_COLORHASH(colors,
+-                                 line + x);
++                for (x = 0; x < w; x++) {
++                    /* fast lookup that works if cpp == 1 */
++                    const struct hash_entry *entry = colors->table[*(Uint8 *)(line + x)];
++                    dst[x] = entry ? (Uint8) entry->color : 0;
++                }
+             else
+                 for (x = 0; x < w; x++)
+                     dst[x] = (Uint8)get_colorhash(colors,

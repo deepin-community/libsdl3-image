@@ -6,7 +6,7 @@ Priority: optional
 Rules-Requires-Root: no
 Build-Depends: cmake (>= 3.16),
                debhelper-compat (= 13),
-               libsdl3-dev (>= 3.2.0),
+               libsdl3-dev (>= 3.2.6),
                libjpeg-dev,
                libpng-dev,
                libtiff-dev,
@@ -14,10 +14,10 @@ Build-Depends: cmake (>= 3.16),
                ninja-build,
                pkgconf,
                zlib1g-dev
-Standards-Version: 4.7.0
+Standards-Version: 4.7.2
 Homepage: https://github.com/libsdl-org/SDL_image
 Vcs-Browser: https://salsa.debian.org/sdl-team/libsdl3-image
-Vcs-Git: https://salsa.debian.org/sdl-team/libsdl3-image.git
+Vcs-Git: https://salsa.debian.org/sdl-team/libsdl3-image.git -b debian/trixie
 
 Package: libsdl3-image0
 Architecture: any
@@ -39,7 +39,7 @@ Section: libdevel
 Depends: ${misc:Depends},
          libjpeg-dev,
          libpng-dev,
-         libsdl3-dev (>= 3.2.0),
+         libsdl3-dev (>= 3.2.6),
          libsdl3-image0 (= ${binary:Version}),
          libtiff-dev,
          libwebp-dev,

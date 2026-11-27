@@ -1,0 +1,11 @@
+Fixed-out-of-bounds-read-in-XCF-image-loader-thanks-Sebas.patch
+xpm-Remove-QUICK_COLORHASH-replace-it-with-inline-code-th.patch
+Fix-heap-buffer-overflow-WRITE-in-LBM-palette-CWE-122.patch
+Fix-heap-underflow-WRITE-in-XCF-read_string-CWE-787.patch
+Fix-heap-buffer-overflow-READ-in-XCF-do_layer_surface-CWE.patch
+xcf-Added-an-SDL_SetError-when-rejecting-out-of-bounds-ti.patch
+Fix-heap-buffer-overflow-READ-in-XCF-RLE-decoder-CWE-122.patch
+xcf-fix-null-pointer-dereference-when-read_xcf_hierarchy-.patch
+tga-reject-images-with-zero-width-or-height.patch
+Fixed-out-of-bound-read-in-GIF-decoder.patch
+IMG_xcf.c-read_string-add-back-the-positive-string-size-c.patch

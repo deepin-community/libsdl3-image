@@ -1,0 +1,39 @@
+From: Jorge Barredo Ferreira <jorgebarredo14@gmail.com>
+Date: Thu, 23 Apr 2026 11:20:40 -0700
+Subject: tga: reject images with zero width or height
+
+When SDL_CreateSurface() is called with w=0 or h=0 it may return a
+non-NULL surface but with a NULL pixels pointer (zero-size allocation).
+Subsequent code at IMG_LoadTGA_IO accesses img->pixels unconditionally,
+resulting in undefined behavior: UBSan reports "applying zero offset to
+null pointer" for the expression (Uint8*)img->pixels + (h-1)*img->pitch
+when pitch is 0.
+
+Reject zero-dimension images early before creating the surface.
+
+CWE-476 (NULL Pointer Dereference)
+Found by: NORAI fuzzer (libFuzzer + UBSan)
+PoC: poc_sdl007_tga_null_pixels.tga
+
+(cherry picked from commit 4ba58feebaf87ad80b8ab3971ea8f82132884c54)
+
+Origin: upstream, 3.4.4, commit:f5c0968ec14318ab489740877f1e66d32b014fbc
+---
+ src/IMG_tga.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/IMG_tga.c b/src/IMG_tga.c
+index 92ace3d..1593cdb 100644
+--- a/src/IMG_tga.c
++++ b/src/IMG_tga.c
+@@ -178,6 +178,10 @@ SDL_Surface *IMG_LoadTGA_IO(SDL_IOStream *src)
+ 
+     w = LE16(hdr.width);
+     h = LE16(hdr.height);
++    if (w == 0 || h == 0) {
++        error = "TGA image with zero width or height";
++        goto error;
++    }
+     img = SDL_CreateSurface(w, h, format);
+     if (img == NULL) {
+         error = "Out of memory";
