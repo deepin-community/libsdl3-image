@@ -1,0 +1,29 @@
+From: Sam Lantinga <slouken@libsdl.org>
+Date: Wed, 29 Apr 2026 08:18:09 -0700
+Subject: Fixed out of bound read in GIF decoder
+
+(cherry picked from commit e2b258927d11438cbf4ee55a5c4ff059a6e32d08)
+
+Bug: https://github.com/libsdl-org/SDL_image/issues/724
+Origin: upstream, 3.4.4, commit:377d1fbb2ec4ea73e0b99fb926b38cee8e1afea1
+---
+ src/IMG_gif.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/IMG_gif.c b/src/IMG_gif.c
+index 7775ca5..0124f0f 100644
+--- a/src/IMG_gif.c
++++ b/src/IMG_gif.c
+@@ -466,8 +466,10 @@ GetCode(SDL_IOStream *src, int code_size, int flag, State_t * state)
+                 RWSetMsg("ran off the end of my bits");
+             return -1;
+         }
+-        state->buf[0] = state->buf[state->last_byte - 2];
+-        state->buf[1] = state->buf[state->last_byte - 1];
++        if (state->last_byte > 2) {
++            state->buf[0] = state->buf[state->last_byte - 2];
++            state->buf[1] = state->buf[state->last_byte - 1];
++        }
+ 
+         if ((ret = GetDataBlock(src, &state->buf[2], state)) > 0)
+             count = (unsigned char) ret;

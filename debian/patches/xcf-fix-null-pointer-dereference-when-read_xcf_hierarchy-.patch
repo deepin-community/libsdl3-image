@@ -1,0 +1,38 @@
+From: Jorge Barredo Ferreira <jorgebarredo14@gmail.com>
+Date: Tue, 7 Apr 2026 17:16:58 +0200
+Subject: xcf: fix null pointer dereference when read_xcf_hierarchy() fails
+
+read_xcf_hierarchy() can return NULL when SDL_calloc() fails or when
+SDL_ReadU32BE() fails to read the width/height/bpp fields. The return
+value was not checked before dereferencing hierarchy->bpp at line 755
+in do_layer_surface(), leading to a null pointer dereference.
+
+Add a NULL check immediately after the call to return early with an
+error in that case.
+
+CWE-476 (NULL Pointer Dereference)
+Found by: NORAI fuzzer (libFuzzer + ASan/UBSan)
+PoC: poc_sdl006_xcf_hierarchy_null.xcf
+
+(cherry picked from commit 336fb104494815984250c40f8ee6bd1325b7ba1e)
+
+Origin: upstream, 3.4.4, commit:1e81a7f9618a244964387bc18f1451c759841931
+---
+ src/IMG_xcf.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/IMG_xcf.c b/src/IMG_xcf.c
+index 482c2a5..e0360f9 100644
+--- a/src/IMG_xcf.c
++++ b/src/IMG_xcf.c
+@@ -753,6 +753,10 @@ do_layer_surface(SDL_Surface *surface, SDL_IOStream *src, xcf_header *head, xcf_
+         return 1;
+     }
+     hierarchy = read_xcf_hierarchy(src, head);
++    if (!hierarchy) {
++        SDL_SetError("Failed to read XCF image hierarchy");
++        return 1;
++    }
+ 
+     if (hierarchy->bpp > 4) {  /* unsupported. */
+         SDL_SetError("Unknown Gimp image bpp (%u)", (unsigned int) hierarchy->bpp);

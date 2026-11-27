@@ -1,3 +1,59 @@
+libsdl3-image (3.2.4+ds-1+deb13u1) trixie; urgency=medium
+
+  * d/control, d/gbp.conf: Branch for trixie
+  * d/patches: Add a malformed-image parser robustness fix from 3.4.2:
+    - d/p/Fixed-out-of-bounds-read-in-XCF-image-loader-thanks-Sebas.patch:
+      Avoid an out-of-bounds read when loading invalid XCF images
+      (CVE-2026-35444, same issue as #1133010 in libsdl2-image)
+  * d/patches: Add selected upstream malformed-image parser robustness
+    fixes from 3.4.4:
+    - d/p/xpm-Remove-QUICK_COLORHASH-replace-it-with-inline-code-th.patch:
+      Check XPM colour hash entries before use
+    - d/p/Fix-heap-buffer-overflow-WRITE-in-LBM-palette-CWE-122.patch
+      Avoid an out-of-bounds write when parsing LBM images
+    - d/p/Fix-heap-underflow-WRITE-in-XCF-read_string-CWE-787.patch
+      Avoid an out-of-bounds write if XCF files contain a zero-length string
+    - d/p/Fix-heap-buffer-overflow-READ-in-XCF-do_layer_surface-CWE.patch,
+      d/p/xcf-Added-an-SDL_SetError-when-rejecting-out-of-bounds-ti.patch:
+      Avoid an out-of-bounds read when parsing XCF file tile data, and
+      report the resulting error correctly
+    - d/p/Fix-heap-buffer-overflow-READ-in-XCF-RLE-decoder-CWE-122.patch:
+      Avoid an out-of-bounds read when parsing XCF files with RLE encoding
+    - d/p/xcf-fix-null-pointer-dereference-when-read_xcf_hierarchy-.patch:
+      Check XCF hierarchy read failures before dereferencing
+    - d/p/tga-reject-images-with-zero-width-or-height.patch:
+      Reject zero-sized TGA images as invalid
+    - d/p/Fixed-out-of-bound-read-in-GIF-decoder.patch:
+      Avoid out-of-bounds reads in the GIF decoder
+  * d/patches: Add an additional parser robustness fix from upstream git:
+    - d/p/IMG_xcf.c-read_string-add-back-the-positive-string-size-c.patch
+      Harden XCF parsing against extremely long strings
+  * Thanks to Aquila Macedo Costa
+
+ -- Simon McVittie <smcv@debian.org>  Sun, 23 Aug 2026 14:44:26 +0100
+
+libsdl3-image (3.2.4+ds-1) unstable; urgency=medium
+
+  * New upstream stable release
+  * d/p/Revert-Fixed-partial-alpha-in-ICO-and-CUR-images.patch:
+    Remove workaround, no longer necessary
+  * Standards-Version: 4.7.2 (no changes required)
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 04 Mar 2025 10:00:27 +0000
+
+libsdl3-image (3.2.2+ds-2) unstable; urgency=medium
+
+  * Revert .ico, .cur alpha change pending investigation
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 03 Mar 2025 19:32:32 +0000
+
+libsdl3-image (3.2.2+ds-1) unstable; urgency=medium
+
+  * New upstream stable release
+  * d/control: Depend on SDL 3.2.6 as per CMakeLists.txt
+
+ -- Simon McVittie <smcv@debian.org>  Mon, 03 Mar 2025 11:03:01 +0000
+
 libsdl3-image (3.2.0+ds-2) unstable; urgency=medium
 
   * d/control, d/copyright: Update upstream URLs

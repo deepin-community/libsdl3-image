@@ -1,0 +1,33 @@
+From: Jorge Barredo Ferreira <jorgebarredo14@gmail.com>
+Date: Mon, 6 Apr 2026 19:29:38 +0200
+Subject: Fix heap-buffer-overflow WRITE in LBM palette (CWE-122)
+
+When nbplanes > 8 without HAM flag, nbrcolorsfinal exceeds 256,
+causing writes past the palette buffer. Reject nbplanes > 8 for
+paletted images.
+
+(cherry picked from commit 2fe0746733c9f280d2c344bce231dd70fdf3bdb8)
+
+Origin: upstream, 3.4.4, commit:20a4b7686bfeda6551c739f4a4f1feaf63979375
+---
+ src/IMG_lbm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/IMG_lbm.c b/src/IMG_lbm.c
+index 577ca19..af6ba78 100644
+--- a/src/IMG_lbm.c
++++ b/src/IMG_lbm.c
+@@ -234,6 +234,13 @@ SDL_Surface *IMG_LoadLBM_IO(SDL_IOStream *src )
+ 
+     nbplanes = bmhd.planes;
+ 
++    /* Sanity check: nbplanes must not exceed 8 for paletted images.
++       Higher values cause 1<<nbplanes to exceed the 256-entry palette. */
++    if ( !pbm && nbplanes > 8 && nbplanes != 24 && flagHAM == 0 ) {
++        SDL_SetError("LBM: invalid number of bitplanes (%u)", nbplanes);
++        goto done;
++    }
++
+     if ( pbm )                         /* File format : 'Packed Bitmap' */
+     {
+         bytesperline *= 8;

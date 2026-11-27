@@ -1,0 +1,23 @@
+From: "Ryan C. Gordon" <icculus@icculus.org>
+Date: Mon, 6 Apr 2026 14:58:56 -0400
+Subject: xcf: Added an SDL_SetError when rejecting out-of-bounds tile data.
+
+(cherry picked from commit 1aedddcbd205c4e1ea0f99fdb2c785acc8e2489b)
+
+Origin: upstream, 3.4.4, commit:58133e6df69a0107e1ab34e8e564a1ab8706edb8
+---
+ src/IMG_xcf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/IMG_xcf.c b/src/IMG_xcf.c
+index 3fe4c7a..b65061e 100644
+--- a/src/IMG_xcf.c
++++ b/src/IMG_xcf.c
+@@ -794,6 +794,7 @@ do_layer_surface(SDL_Surface *surface, SDL_IOStream *src, xcf_header *head, xcf_
+ 
+             /* Bounds check: reject layer if tile data exceeds buffer */
+             if ((Uint64)ox * oy * hierarchy->bpp > (Uint64)(hierarchy->width * hierarchy->height * hierarchy->bpp)) {
++                SDL_SetError("Gimp image invalid tile");
+                 free_xcf_tile(tile);
+                 free_xcf_level(level);
+                 free_xcf_hierarchy(hierarchy);

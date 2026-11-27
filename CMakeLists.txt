@@ -9,8 +9,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 # See docs/release_checklist.md
 set(MAJOR_VERSION 3)
 set(MINOR_VERSION 2)
-set(MICRO_VERSION 0)
-set(SDL_REQUIRED_VERSION 3.2.0)
+set(MICRO_VERSION 4)
+set(SDL_REQUIRED_VERSION 3.2.6)
 
 project(SDL3_image
     LANGUAGES C
@@ -1047,6 +1047,9 @@ if(SDLIMAGE_INSTALL)
         FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/SDL3_image/SDL_image.h"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SDL3_image" COMPONENT DEVEL
     )
+
+    export(TARGETS ${sdl3_image_target_name} ${INSTALL_EXTRA_TARGETS} NAMESPACE "SDL3_image::" FILE "${sdl3_image_target_name}-targets.cmake")
+
     if(BUILD_SHARED_LIBS)
         set(pdbdir "${CMAKE_INSTALL_BINDIR}")
     else()
@@ -1118,6 +1121,17 @@ if(SDLIMAGE_INSTALL)
       set(SDL_PKGCONFIG_PREFIX "\${pcfiledir}/${SDL_PATH_PREFIX_RELATIVE_TO_PKGCONFIG}")
     else()
       set(SDL_PKGCONFIG_PREFIX "${CMAKE_INSTALL_PREFIX}")
+    endif()
+
+    if(IS_ABSOLUTE "${CMAKE_INSTALL_INCLUDEDIR}")
+      set(INCLUDEDIR_FOR_PKG_CONFIG "${CMAKE_INSTALL_INCLUDEDIR}")
+    else()
+      set(INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+    endif()
+    if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
+      set(LIBDIR_FOR_PKG_CONFIG "${CMAKE_INSTALL_LIBDIR}")
+    else()
+      set(LIBDIR_FOR_PKG_CONFIG "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
     endif()
 
     string(JOIN " " PC_REQUIRES ${PC_REQUIRES})

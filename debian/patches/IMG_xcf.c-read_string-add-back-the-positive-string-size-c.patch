@@ -1,0 +1,24 @@
+From: Ozkan Sezer <sezeroz@gmail.com>
+Date: Wed, 13 May 2026 14:51:28 +0300
+Subject: IMG_xcf.c (read_string): add back the positive string size check
+
+(cherry picked from commit 2eda043e2c4cabd565f7d8e04893fb53efd857ef)
+
+Origin: upstream, 3.4.6, commit:15cb42b7fd270aa5dc12d097f964d24c33d7f18b
+---
+ src/IMG_xcf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/IMG_xcf.c b/src/IMG_xcf.c
+index e0360f9..9ea21ec 100644
+--- a/src/IMG_xcf.c
++++ b/src/IMG_xcf.c
+@@ -245,7 +245,7 @@ static char *read_string(SDL_IOStream *src)
+             return data;
+         }
+         remaining = SDL_GetIOSize(src) - SDL_TellIO(src);
+-        if (tmp <= remaining) {
++        if ((Sint32)tmp > 0 && tmp <= remaining) {
+             data = (char *)SDL_malloc(tmp);
+             if (data) {
+                 if (SDL_ReadIO(src, data, tmp) == tmp) {
